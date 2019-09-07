@@ -46,12 +46,12 @@ double getYSemaforo(Semaforo s) {
 
 bool compararIDSemaforo(Semaforo s, char *id) {
     StSemaforo sem = (StSemaforo) s;
-    return strcmp(sem->id, id);
+    return strcmp(sem->id, id) == 0;
 }
 
 void desalocarSemaforo(Semaforo s) {
     StSemaforo sem = (StSemaforo) s;
-    free(s);
+    free(sem);
 }
 
 void setXSemaforo(Semaforo s, double x) {

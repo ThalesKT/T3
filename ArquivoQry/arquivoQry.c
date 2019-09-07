@@ -9,7 +9,7 @@ Lista listaRadioBase, FILE *consultaSVG) {
     arquivoTXT = fopen(saidaconsultatxt, "w");
     consulta = fopen(pesquisaconsulta, "r");
     char linha[100], instrucao[15];
-
+    int test=0;
     while(true) {
 
         fgets(linha, 99, consulta);
@@ -17,7 +17,7 @@ Lista listaRadioBase, FILE *consultaSVG) {
 		if(feof(consulta))
 			break;
 
-
+        printf("qnts vezes %d\n", test);
         if(strcmp(instrucao, "o?") == 0) {
             char id1[15], id2[15], tipo1[15], tipo2[15];
             sscanf(linha, "%*s %s %s", id1, id2);
@@ -151,17 +151,17 @@ Lista listaRadioBase, FILE *consultaSVG) {
                 excluirElementoLista(listaQuadras, id1, compararIDQuadra, desalocarQuadra);
 
             } else if( (h = getElementoLista(listaHidrantes, id1, compararIDHidrante)) != NULL) {
-                fprintf(arquivoTXT, "Hidrante removido. ID: %s Localizacao: %.2lf %.2lf",
+                fprintf(arquivoTXT, "Hidrante removido. ID: %s Localizacao: %.2lf %.2lf\n",
                 id1, getXHidrante(h), getYHidrante(h));
                 excluirElementoLista(listaHidrantes, id1, compararIDHidrante, desalocarHidrante);
 
             } else if( (rb = getElementoLista(listaRadioBase, id1, compararIDRadioBase)) != NULL) {
-                fprintf(arquivoTXT, "Torre removida. ID: %s Localizacao: %.2lf %.2lf",
+                fprintf(arquivoTXT, "Torre removida. ID: %s Localizacao: %.2lf %.2lf\n",
                 id1, getXRadioBase(h), getYRadioBase(h));
                 excluirElementoLista(listaRadioBase, id1, compararIDRadioBase, desalocarRadioBase);
 
             } else if( (s = getElementoLista(listaSemaforo, id1, compararIDSemaforo)) != NULL) {
-                fprintf(arquivoTXT, "Semaforo removido. ID: %s Localizacao: %.2lf %.2lf",
+                fprintf(arquivoTXT, "Semaforo removido. ID: %s Localizacao: %.2lf %.2lf\n",
                 id1, getXSemaforo(h), getYSemaforo(h));
                 excluirElementoLista(listaSemaforo, id1, compararIDSemaforo, desalocarSemaforo);
                 
@@ -169,6 +169,7 @@ Lista listaRadioBase, FILE *consultaSVG) {
                 fprintf(arquivoTXT, "ID/CEP %s não encontrado.\n", id1);
             }
         }
+        test++;
     }
 
 }

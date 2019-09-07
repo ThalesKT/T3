@@ -45,7 +45,7 @@ double getYRadioBase(radioBase r) {
 
 bool compararIDRadioBase(radioBase r, char *id) {
     StRadioBase radio = (StRadioBase) r;
-    return strcmp(radio->id, id);
+    return strcmp(radio->id, id) == 0;
 }
 
 void desalocarRadioBase(radioBase r) {
