@@ -9,7 +9,7 @@ Lista listaRadioBase, FILE *consultaSVG) {
     arquivoTXT = fopen(saidaconsultatxt, "w");
     consulta = fopen(pesquisaconsulta, "r");
     char linha[100], instrucao[15];
-    int test=0;
+
     while(true) {
 
         fgets(linha, 99, consulta);
@@ -17,7 +17,6 @@ Lista listaRadioBase, FILE *consultaSVG) {
 		if(feof(consulta))
 			break;
 
-        printf("qnts vezes %d\n", test);
         if(strcmp(instrucao, "o?") == 0) {
             char id1[15], id2[15], tipo1[15], tipo2[15];
             sscanf(linha, "%*s %s %s", id1, id2);
@@ -139,7 +138,6 @@ Lista listaRadioBase, FILE *consultaSVG) {
         } else if(strcmp(instrucao, "del") == 0) {
             char id1[20];
             sscanf(linha, "%*s %s", id1);
-            printf("ID> %s\n", id1);
             Quadra q;
             Hidrante h;
             radioBase rb;
@@ -157,19 +155,56 @@ Lista listaRadioBase, FILE *consultaSVG) {
 
             } else if( (rb = getElementoLista(listaRadioBase, id1, compararIDRadioBase)) != NULL) {
                 fprintf(arquivoTXT, "Torre removida. ID: %s Localizacao: %.2lf %.2lf\n",
-                id1, getXRadioBase(h), getYRadioBase(h));
+                id1, getXRadioBase(rb), getYRadioBase(rb));
                 excluirElementoLista(listaRadioBase, id1, compararIDRadioBase, desalocarRadioBase);
 
             } else if( (s = getElementoLista(listaSemaforo, id1, compararIDSemaforo)) != NULL) {
                 fprintf(arquivoTXT, "Semaforo removido. ID: %s Localizacao: %.2lf %.2lf\n",
-                id1, getXSemaforo(h), getYSemaforo(h));
+                id1, getXSemaforo(s), getYSemaforo(s));
                 excluirElementoLista(listaSemaforo, id1, compararIDSemaforo, desalocarSemaforo);
                 
             } else {
                 fprintf(arquivoTXT, "ID/CEP %s não encontrado.\n", id1);
             }
+
+        } else if(strcmp(instrucao,"cbq") == 0) {
+            double x, y, r;
+            char novaBorda[35];
+            sscanf(linha, "%*s %lf %lf %lf %s", &x, &y, &r, novaBorda);
+            Circulo c = criarCirculo("cbq", r, x, y, "black", "yello", "3px");
+            colorirQuadrasDentroCirculo(listaQuadras, c, novaBorda, arquivoTXT);
+            desalocarCirculo(c);
+
+        } else if(strcmp(instrucao, "crd?") == 0) {
+            fprintf(arquivoTXT,"Dados elemento, comando CRD?\n");
+            char id1[20];
+            sscanf(linha, "%*s %s", id1);
+
+            Quadra q;
+            Hidrante h;
+            Semaforo s;
+            radioBase rb;
+
+            if((q = getElementoLista(listaQuadras, id1, compararIDQuadra)) != NULL) {
+                fprintf(arquivoTXT, "QUADRA --> CEP: %s, COORDENADAS: %.2lf %.2lf\n", id1,
+                getXQuadra(q), getYQuadra(q));
+
+            } else if((h = getElementoLista(listaHidrantes, id1, compararIDHidrante)) != NULL) {
+                fprintf(arquivoTXT, "HIDRANTE --> ID: %s, COORDENADAS: %.2lf %.2lf\n", id1,
+                getXHidrante(h), getYHidrante(h));
+
+            } else if( (s = getElementoLista(listaSemaforo, id1, compararIDSemaforo)) != NULL) {
+                fprintf(arquivoTXT, "SEMAFORO --> ID:%s, COORDENADAS: %.2lf %.2lf\n", id1,
+                getXSemaforo(s), getYSemaforo(s));
+
+            } else if( (rb = getElementoLista(listaRadioBase, id1, compararIDRadioBase)) != NULL) {
+                fprintf(arquivoTXT, "TORRE --> ID: %s, COORDENADAS: %.2lf %.2lf\n", id1,
+                getXSemaforo(rb), getYSemaforo(rb));
+
+            } else {
+                fprintf(arquivoTXT,"Elemento com ID/CEP %s NÃO ENCONTRADO \n", id1);
+            }
         }
-        test++;
     }
 
 }
