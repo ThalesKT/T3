@@ -145,18 +145,19 @@ char *saidaconsultatxt, char *saidaconsultasvg, char *boundingbox) {
             sscanf(linhaGeo, "%s %s", espessuraBordaCirculo, espessuraBordaRetangulo);
 
         } else if(strcmp(tipoElemento, "prd") == 0) {
+            fgets(linhaGeo, 149, geo);
             char cep[30], face, gambiarra[15];
             double numero, f, profundidade, mrg;
-            sscanf(linhaGeo, "%*s %s %c %lf %lf %lf %lf", cep, &face, &numero, &f, &profundidade, &mrg);
+            sscanf(linhaGeo, "%s %c %lf %lf %lf %lf", cep, &face, &numero, &f, &profundidade, &mrg);
+            //printf("%s\n", cep);            
             Predio prd = criarPredio(cep, face, numero, f, profundidade, mrg);
-            //fprintf(gambiarra, "%c",numero);
-            printf("predio criado\n");
             inserirFinalLista(listaPredios, prd, "prd", "gambiarra");
 
         } else if(strcmp(tipoElemento, "mur") == 0) {
+            fgets(linhaGeo, 149, geo);
             double x1, y1, x2, y2;
-
-            sscanf(linhaGeo, "%*s %lf %lf %lf %lf", &x1, &y1, &x2, &y2);
+            //printf("muro criado\n");
+            sscanf(linhaGeo, "%lf %lf %lf %lf", &x1, &y1, &x2, &y2);
             Muro m = criarMuro(x1, y1, x2, y2);
             inserirFinalLista(listaMuros, m, "m", "toatrasado");
         }
@@ -173,9 +174,9 @@ char *saidaconsultatxt, char *saidaconsultasvg, char *boundingbox) {
         Predio prd = getElementoListaPosicao(listaPredios, i);
         strcpy(cep, getCepPredio(prd));
         Quadra q;
-        printf("entrou aqui \n");
+        //printf("entrou aqui \n");
         if( (q = getElementoLista(listaQuadras, cep, compararIDQuadra)) != NULL){
-            printf("vamos ver se entrou aqui\n");
+            //printf("vamos ver se entrou aqui\n");
             escreverPredioSVG(prd, getXQuadra(q), getYQuadra(q),
              getLarguraQuadra(q), getAlturaQuadra(q), saidaGeoSVG);
         }
