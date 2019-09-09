@@ -13,6 +13,9 @@
 #include "../Semaforo/semaforo.h"
 #include "../RadioBase/radioBase.h"
 #include "../ArquivoQry/arquivoQry.h"
+#include "../Predio/predio.h"
+#include "../Ponto/ponto.h"
+#include "../Muro/muro.h"
 
 void arquivoGeo(char *pesquisageo, char *pesquisaconsulta,char *saidageosvg,
 char *saidaconsultatxt, char *saidaconsultasvg, char *boundingbox);

@@ -49,7 +49,7 @@ FILE *saidaTXT) {
     }
 
     if(strcmp(tipoMetrica, "L1") == 0 || strcmp(tipoMetrica,"l1") == 0) {
-        printf("METRICA L1\n");
+        //printf("METRICA L1\n");
         while(true) {
             Quadra q = getElementoListaPosicao(listaQuadras, posicaoLista);
             Retangulo r = criarRetangulo("L1", getAlturaQuadra(q),
@@ -75,7 +75,7 @@ FILE *saidaTXT) {
         }
     } else if(strcmp(tipoMetrica, "L2") == 0 || strcmp(tipoMetrica, "L2") == 0) {
         Circulo c = criarCirculo("L2", distancia, x, y, "yellow", "blue", "3px");
-        printf("METRICA L2\n");
+        //printf("METRICA L2\n");
 
         while(true) {
             Quadra q = getElementoListaPosicao(listaQuadras, posicaoLista);
@@ -178,4 +178,181 @@ Lista listaSemaforo, Retangulo r, double dx, double dy, FILE *saidaTXT) {
         }
 
     }
+}
+
+// Struct e função utilizadas para qsort
+typedef struct obj {
+        double distancia;
+        void *Elemento;
+} *pObj;
+
+double get_obj_comparador(Elemento o) {
+    pObj elemento = (pObj) o;
+    return elemento->distancia;
+}
+
+void processarFocoIncendio(Lista listaSemaforos, Lista listaHidrantes, double x,
+ double y, int ns, double r, FILE *txt, FILE *svg) {
+    
+    int i, tamanhoLista = getTamanhoLista(listaSemaforos);
+
+    // Semaforos mais proximos do foco de incendio
+    pObj* semaforos_comparar = (pObj*)malloc(tamanhoLista*sizeof(pObj));
+
+    i = getPrimeiroElementoLista(listaSemaforos);
+    int index = 0;
+    for(i; i != -1; i = getProximoElemento(listaSemaforos, i)) {
+        Semaforo s = getElementoListaPosicao(listaSemaforos, i);
+
+        double distancia = distanciaL2(x, y, getXSemaforo(s), getYSemaforo(s));
+
+        pObj o = malloc(sizeof(struct obj));
+        o->distancia = distancia;
+        o->Elemento = s;
+
+        semaforos_comparar[index] = o;
+        index++;
+    }
+
+    //qsort(semaforos_comparar, tamanhoLista, sizeof(struct obj), compCrescente);
+    heapsortMenor((Elemento*)semaforos_comparar, tamanhoLista, ns, get_obj_comparador);
+    fprintf(txt, "-- SEMAFOROS PRÓXIMOS AO FOCO DE INCENDIO --\n");
+    for(int i = tamanhoLista - ns; i < tamanhoLista; i++) {
+        Semaforo s = ((pObj)semaforos_comparar[i])->Elemento;
+        fprintf(txt, "ID -> %s\n", getIDSemaforo(s));
+
+        Circulo c1 = criarCirculo("tafoda", 7, getXSemaforo(s), getYSemaforo(s), "orange", "none", "3px");
+        escreverCirculoSVG(c1, svg);
+        desalocarCirculo(c1);
+
+        Circulo c2 = criarCirculo("tafoda", 9, getXSemaforo(s), getYSemaforo(s), "gold", "none", "3px");
+        escreverCirculoSVG(c2, svg);
+        desalocarCirculo(c2);
+
+        Muro m = criarMuro(x, y, getXSemaforo(s), getYSemaforo(s));
+        escreverMuroSVG(m, svg);
+        desalocarMuro(m);
+    }
+
+    for(int i = 0; i < tamanhoLista; i++) free(semaforos_comparar[i]);
+    free(semaforos_comparar);
+    fprintf(txt, "-------------------------------------------\n");
+
+    // Hidrantes dentro de uma distancia r do foco de incendio
+    Circulo circ = criarCirculo("tafoda", r, x, y, "gold", "none", "3px");
+    i = getPrimeiroElementoLista(listaHidrantes);
+    fprintf(txt, "-- HIDRANTES PRÓXIMOS AO FOCO DE INCENDIO --\n");
+    for(i; i != -1; i = getProximoElemento(listaHidrantes, i)) {
+        Hidrante h = getElementoListaPosicao(listaHidrantes, i);
+
+        if(pontoInternoCirculo(getXHidrante(h), getYHidrante(h), circ)) {
+            fprintf(txt, "ID -> %s\n", getIDHidrante(h));
+
+            Circulo c1 = criarCirculo("tafoda", 7, getXHidrante(h), getYHidrante(h), "orange", "none", "3px");
+                escreverCirculoSVG(c1, svg);
+            desalocarCirculo(c1);
+
+            Circulo c2 = criarCirculo("tafoda", 9, getXHidrante(h), getYHidrante(h), "gold", "none", "3px");
+                escreverCirculoSVG(c2, svg);
+            desalocarCirculo(c2);
+
+            Muro m = criarMuro(x, y, getXHidrante(h), getYHidrante(h));
+            escreverMuroSVG(m, svg);
+            desalocarMuro(m);
+        }
+    }
+    desalocarCirculo(circ);
+    fprintf(txt, "-------------------------------------------\n");
+}
+
+
+void processarObjetosProximos(Lista listaElemento, Lista listaQuadras, char sinal, int k,
+ char cep[], char face, double num, FILE* txt, FILE *svg, char tipo[]) {
+
+    int i;
+    double x, y;
+    Lista lista;
+
+    if(strcmp(tipo, "hidrante") == 0) {
+        lista = listaElemento;
+    } else if(strcmp(tipo, "semaforo") == 0) {
+        lista = listaElemento;
+    }
+
+    int tamanhoLista = getTamanhoLista(lista);
+
+    Quadra q = getElementoLista(listaQuadras, cep, compararIDQuadra);
+    if(q == NULL) return;
+    if(face == 'N') {
+        x = getXQuadra(q) + num;
+        y = getYQuadra(q) + getAlturaQuadra(q);
+    } else if(face == 'S') {
+        x = getXQuadra(q) + num;
+        y = getYQuadra(q);
+    } else if(face == 'L') {
+        x = getXQuadra(q);
+        y = getYQuadra(q) + num;
+    } else if(face == 'O') {
+        x = getXQuadra(q) + getLarguraQuadra(q);
+        y = getYQuadra(q) + num;
+    }
+
+    pObj* objetos_comparar = (pObj*)malloc(tamanhoLista*sizeof(pObj));
+
+    i = getPrimeiroElementoLista(lista);
+    int index = 0;
+    for(i; i != -1; i = getProximoElemento(lista, i)) {
+        Elemento o = getElementoListaPosicao(lista, i);
+
+        double distancia;
+        if(strcmp(tipo, "hidrante") == 0) {
+            distancia = distanciaL2(x, y, getXHidrante(o), getYHidrante(o));
+        } else if(strcmp(tipo, "semaforo") == 0) {
+            distancia = distanciaL2(x, y, getXSemaforo(o), getYSemaforo(o));
+        }
+
+        pObj ob = malloc(sizeof(struct obj));
+        ob->distancia = distancia;
+        ob->Elemento = o;
+
+        objetos_comparar[index] = ob;
+        index++;
+    }
+
+    if(sinal == '-')
+        heapsortMenor((Elemento*)objetos_comparar, tamanhoLista, k, get_obj_comparador);
+        //qsort(objetos_comparar, lista_length(lista), sizeof(struct obj), compCrescente);
+    else
+        heapsortMaior((Elemento*)objetos_comparar, tamanhoLista, k, get_obj_comparador);
+        //qsort(objetos_comparar, lista_length(lista), sizeof(struct obj), compDecrescente);
+    fprintf(txt, "-- %d %s MAIS %s DO CEP %s --\n", k, ((strcmp(tipo, "hidrante") == 0) ? "HIDRANTES" : "SEMAFOROS"), (sinal == '+' ? "PRÓXIMOS" : "DISTANTES"), cep);
+    for(int i = tamanhoLista - k; i < tamanhoLista; i++) {
+        Elemento o = ((pObj)objetos_comparar[i])->Elemento;
+        Circulo c1, c2;
+        Muro m;
+
+        if(strcmp(tipo, "hidrante") == 0) {
+            fprintf(txt, "ID -> %s\n", getIDHidrante(o));
+            c1 = criarCirculo("dificil", 7, getXHidrante(o), getYHidrante(o), "orange", "none", "3px");
+            c2 = criarCirculo("demais", 9, getXHidrante(o), getYHidrante(o), "gold", "none", "3px");
+            m = criarMuro(x, y, getXHidrante(o), getYHidrante(o));
+        } else if(strcmp(tipo, "semaforo") == 0) {
+            fprintf(txt, "ID -> %s\n", getIDSemaforo(o));
+            c1 = criarCirculo("dificil", 7, getXSemaforo(o), getYSemaforo(o), "orange", "none", "3px");
+            c2 = criarCirculo("demais", 9, getXSemaforo(o), getYSemaforo(o), "gold", "none", "3px");
+            m = criarMuro(x, y, getXSemaforo(o), getYSemaforo(o));
+        }
+
+        escreverCirculoSVG(c1, svg);
+        desalocarCirculo(c1);
+
+        escreverCirculoSVG(c2, svg);
+        desalocarCirculo(c2);
+
+        escreverMuroSVG(m, svg);
+        desalocarMuro(m);
+    }
+    for(int i = 0; i < tamanhoLista; i++) free(objetos_comparar[i]);
+    free(objetos_comparar);
+    fprintf(txt, "-------------------------------------------\n");
 }

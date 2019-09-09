@@ -27,7 +27,7 @@ void desalocarPredio(Predio prd) {
     free(predio);
 }
 
-char* getCepPredio(Predio prd) {
+char *getCepPredio(Predio prd) {
     StPredio predio = (StPredio) prd;
     return predio->cep;
 }

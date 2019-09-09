@@ -204,6 +204,38 @@ Lista listaRadioBase, FILE *consultaSVG) {
             } else {
                 fprintf(arquivoTXT,"Elemento com ID/CEP %s NÃO ENCONTRADO \n", id1);
             }
+
+        } else if(strcmp(instrucao, "trns") == 0) {
+
+            double x, y, largura, altura, dx, dy;
+            sscanf(linha, "%*s %lf %lf %lf %lf %lf %lf", &x, &y, &largura, &altura, &dx, &dy);
+            Retangulo r = criarRetangulo("trns",altura, largura, x, y, "black", "ywllo", "3px");
+            desalocarElementosDentroRetangulo(listaQuadras, listaHidrantes, listaRadioBase, listaSemaforo,
+            r, dx, dy, arquivoTXT);
+            desalocarRetangulo(r);
+
+        } else if(strcmp(instrucao, "fi") == 0) {
+            double x, y, r;
+            int ns;
+            sscanf(linha, "%*s %lf %lf %d %lf", &x, &y, &ns, &r);
+            processarFocoIncendio(listaSemaforo, listaHidrantes, x, y, ns, r, arquivoTXT, consultaSVG);
+
+        } else if(strcmp(instrucao, "fh") == 0) {
+            int k;
+            double num;
+            char cep[50], face, sinal;
+            sscanf(linha, "%*s %c%d %s %c %lf", &sinal, &k, cep, &face, &num);
+            processarObjetosProximos(listaHidrantes, listaQuadras, sinal,
+             k, cep, face, num, arquivoTXT, consultaSVG, "hidrante");
+
+        } else if(strcmp(instrucao, "fs") == 0) {
+            int k;
+            double num;
+            char cep[50], face, sinal;
+            sscanf(linha, "%*s %d %s %c %lf", &k, cep, &face, &num);
+            processarObjetosProximos(listaHidrantes, listaQuadras, sinal,
+             k, cep, face, num, arquivoTXT, consultaSVG, "semaforo");
+
         }
     }
 

@@ -168,9 +168,11 @@ Elemento getElementoLista(Lista l,
     for(int i = list->primeiroElemento; i != -1; i = list->listaNode[i].proximo) {
 
         if(comparar(list->listaNode[i].elemento, identificador)) {
+            //printf("quadra encontrada\n");
             return list->listaNode[i].elemento;
         }
     }
+    //printf("quadra não encontrada\n");
     return NULL;
 }
 
@@ -214,6 +216,10 @@ bool excluirElementoPosicaoX(Lista l, int i, void(*apagarElemento)(Elemento elem
     StInfoLista lista = (StInfoLista) l;
     if(i == lista->primeiroElemento) {
         lista->primeiroElemento = lista->listaNode[i].proximo;
+        if(lista->listaNode[i].proximo == -1) {
+            lista->listaNode[lista->listaNode[i].anterior].proximo = -1;
+            lista->ultimoElemento = lista->listaNode[i].anterior;
+        }
 
     } else if(lista->listaNode[i].proximo == -1) {
         lista->listaNode[lista->listaNode[i].anterior].proximo = -1;

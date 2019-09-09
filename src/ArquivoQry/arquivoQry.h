@@ -16,6 +16,7 @@
 #include "../Semaforo/semaforo.h"
 #include "../Calculos/calculos.h"
 #include "../Colisao/colisao.h"
+#include "../Muro/muro.h"
 #include "svgQry.h"
 
 void arquivoQry(char *pesquisageo, char *pesquisaconsulta,
@@ -30,6 +31,12 @@ FILE *saidaTXT);
 void colorirQuadrasDentroCirculo(Lista listaQuadras, Circulo c, char *cor, FILE *saidaTXT);
 void desalocarElementosDentroRetangulo(Lista listaQuadras, Lista listaHidrantes, Lista listaRadioBase,
 Lista listaSemaforo, Retangulo r, double dx, double dy, FILE *saidaTXT);
+void heapsortMenor(Elemento a[], int n, int valor, double (*getComparator)(Elemento objeto));
+void heapsortMaior(Elemento a[], int n, int valor, double (*getComparator)(Elemento objeto));
+void processarFocoIncendio(Lista listaSemaforos, Lista listaHidrantes, double x,
+ double y, int ns, double r, FILE *txt, FILE *svg);
+ void processarObjetosProximos(Lista listaElemento, Lista listaQuadras, char sinal, int k,
+ char cep[], char face, double num, FILE* txt, FILE *svg, char tipo[]);
 
 
 

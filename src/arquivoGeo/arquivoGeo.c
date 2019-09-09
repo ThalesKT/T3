@@ -22,6 +22,8 @@ char *saidaconsultatxt, char *saidaconsultasvg, char *boundingbox) {
     Lista listaHidrantes;
     Lista listaSemaforo;
     Lista listaRadioBase;
+    Lista listaPredios;
+    Lista listaMuros;
 
     FILE *geo;
     geo = fopen(pesquisageo, "r");
@@ -37,23 +39,28 @@ char *saidaconsultatxt, char *saidaconsultasvg, char *boundingbox) {
         printf("Não há arquivo de consulta!\n");
     }
   
-    int numeroFormas, numeroQuadras, numeroHidrantes, numeroSemaforos, numeroRadioBase;
+    int numeroFormas, numeroQuadras, numeroHidrantes, numeroSemaforos, numeroRadioBase, numeroPredios, numeroMuros;
     fgets(linhaGeo, 149, geo);
     sscanf(linhaGeo,"%s", tipoElemento);
     if(strcmp(tipoElemento, "nx") == 0) {           
-        sscanf(linhaGeo,"%*s %d %d %d %d %d",&numeroFormas, &numeroQuadras, &numeroHidrantes,
-        &numeroSemaforos, &numeroRadioBase);
+        sscanf(linhaGeo,"%*s %d %d %d %d %d %d %d",&numeroFormas, &numeroQuadras, &numeroHidrantes,
+        &numeroSemaforos, &numeroRadioBase, &numeroPredios, &numeroMuros);
         listaFormas = inicializarLista(numeroFormas);
         listaQuadras = inicializarLista(numeroQuadras);
         listaHidrantes = inicializarLista(numeroHidrantes);
         listaSemaforo = inicializarLista(numeroSemaforos);
         listaRadioBase = inicializarLista(numeroRadioBase);
+        listaPredios = inicializarLista(numeroPredios);
+        listaMuros = inicializarLista(numeroMuros);
+
     } else {
         listaFormas = inicializarLista(1000);
         listaQuadras = inicializarLista(1000);
         listaHidrantes = inicializarLista(1000);
         listaSemaforo = inicializarLista(1000);
         listaRadioBase = inicializarLista(1000);
+        listaPredios = inicializarLista(1000);
+        listaMuros = inicializarLista(1000);
         rewind(geo);
     }
     
@@ -136,6 +143,22 @@ char *saidaconsultatxt, char *saidaconsultasvg, char *boundingbox) {
         } else if(strcmp(tipoElemento, "sw") == 0) {
             fgets(linhaGeo, 149, geo);
             sscanf(linhaGeo, "%s %s", espessuraBordaCirculo, espessuraBordaRetangulo);
+
+        } else if(strcmp(tipoElemento, "prd") == 0) {
+            char cep[30], face, gambiarra[15];
+            double numero, f, profundidade, mrg;
+            sscanf(linhaGeo, "%*s %s %c %lf %lf %lf %lf", cep, &face, &numero, &f, &profundidade, &mrg);
+            Predio prd = criarPredio(cep, face, numero, f, profundidade, mrg);
+            //fprintf(gambiarra, "%c",numero);
+            printf("predio criado\n");
+            inserirFinalLista(listaPredios, prd, "prd", "gambiarra");
+
+        } else if(strcmp(tipoElemento, "mur") == 0) {
+            double x1, y1, x2, y2;
+
+            sscanf(linhaGeo, "%*s %lf %lf %lf %lf", &x1, &y1, &x2, &y2);
+            Muro m = criarMuro(x1, y1, x2, y2);
+            inserirFinalLista(listaMuros, m, "m", "toatrasado");
         }
     }
     
@@ -143,6 +166,31 @@ char *saidaconsultatxt, char *saidaconsultasvg, char *boundingbox) {
     escreverListaSVG(listaHidrantes, escreverHidranteSVG, saidaGeoSVG);
     escreverListaSVG(listaSemaforo, escreverSemaforoSVG, saidaGeoSVG);
     escreverListaSVG(listaRadioBase, escreverRadioBaseSVG, saidaGeoSVG);
+    int i;
+    i = getPrimeiroElementoLista(listaPredios);
+    for(i; i!= -1; i = getProximoElemento(listaPredios, i)) {
+        char cep[35];
+        Predio prd = getElementoListaPosicao(listaPredios, i);
+        strcpy(cep, getCepPredio(prd));
+        Quadra q;
+        printf("entrou aqui \n");
+        if( (q = getElementoLista(listaQuadras, cep, compararIDQuadra)) != NULL){
+            printf("vamos ver se entrou aqui\n");
+            escreverPredioSVG(prd, getXQuadra(q), getYQuadra(q),
+             getLarguraQuadra(q), getAlturaQuadra(q), saidaGeoSVG);
+        }
+
+           
+    }
+
+    i = getPrimeiroElementoLista(listaMuros);
+    for(i; i!= -1; i = getProximoElemento(listaMuros, i)) {
+        Muro m = getElementoListaPosicao(listaMuros, i);
+        escreverMuroSVG(m, saidaGeoSVG);
+    }
+
+
+
 
     fprintf(saidaGeoSVG,"</svg> \n");
     fclose(saidaGeoSVG);
