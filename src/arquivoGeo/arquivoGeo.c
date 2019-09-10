@@ -207,6 +207,10 @@ char *saidaconsultatxt, char *saidaconsultasvg, char *boundingbox) {
         fprintf(consultaSVG,"</svg> \n");
         fclose(consultaSVG);          
     }
-    
+
+    desalocarLista(listaHidrantes, desalocarHidrante);
+    desalocarLista(listaQuadras, desalocarQuadra);
+    desalocarLista(listaSemaforo, desalocarSemaforo);
+    desalocarLista(listaRadioBase, desalocarRadioBase);    
      
 }
