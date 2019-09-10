@@ -32,4 +32,8 @@ char *tipo1, char *tipo2);
 void escreverElipseBB(double x, double y, double raiox, double raioy, FILE *boundingbox, char*cor);
 
 void escreverRetanguloBB(double largura, double altura, double x, double y, FILE *boundingbox, char *cor);
+
+void escreverBombaRL(FILE *SVG, double x, double y);
+
+void escreverTrianguloBRL(FILE *SVG, double x1, double y1, Vertice v2, Vertice v3);
 #endif // !_svgQry_h

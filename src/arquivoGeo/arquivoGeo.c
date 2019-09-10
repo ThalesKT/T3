@@ -199,7 +199,7 @@ char *saidaconsultatxt, char *saidaconsultasvg, char *boundingbox) {
     if(pesquisaconsulta != NULL) {
         printf("Iniciando arquivo .qry \n");
         arquivoQry(pesquisageo, pesquisaconsulta, saidaconsultatxt, saidaconsultasvg, boundingbox,
-        listaFormas, listaQuadras, listaHidrantes, listaSemaforo, listaRadioBase, consultaSVG);
+        listaFormas, listaQuadras, listaHidrantes, listaSemaforo, listaRadioBase, listaPredios, listaMuros, consultaSVG);
         escreverListaSVG(listaQuadras, escreverQuadraSVG, consultaSVG);
         escreverListaSVG(listaHidrantes, escreverHidranteSVG, consultaSVG);
         escreverListaSVG(listaSemaforo, escreverSemaforoSVG, consultaSVG);

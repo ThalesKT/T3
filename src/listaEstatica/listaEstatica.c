@@ -50,7 +50,7 @@ Lista inicializarLista(int tamanhoMax) {
 }
 
 
-void destruirLista(Lista l, void(*destruirElemento)(Elemento elemento)) {
+void desalocarLista(Lista l, void(*destruirElemento)(Elemento elemento)) {
     StInfoLista list = (StInfoLista) l;
 
     for(int i = list->primeiroElemento; i != -1; i = list->listaNode[i].proximo) {
@@ -136,6 +136,10 @@ bool excluirElementoLista(Lista l, char *identificador,
             //o primeiro
             if(i == list->primeiroElemento) {
                 list->primeiroElemento = list->listaNode[i].proximo;
+                if (list->listaNode[i].proximo == -1) {
+                    list->listaNode[i].proximo = -1;
+                    list->ultimoElemento = 0;
+                }
             //se o elemento for ultimo vai fazer o anteriror virar o ultimo
             } else if(list->listaNode[i].proximo == -1) {
                 list->listaNode[list->listaNode[i].anterior].proximo = -1;
@@ -216,9 +220,9 @@ bool excluirElementoPosicaoX(Lista l, int i, void(*apagarElemento)(Elemento elem
     StInfoLista lista = (StInfoLista) l;
     if(i == lista->primeiroElemento) {
         lista->primeiroElemento = lista->listaNode[i].proximo;
-        if(lista->listaNode[i].proximo == -1) {
-            lista->listaNode[lista->listaNode[i].anterior].proximo = -1;
-            lista->ultimoElemento = lista->listaNode[i].anterior;
+        if (lista->listaNode[i].proximo == -1) {
+            lista->listaNode[i].proximo = -1;
+            lista->ultimoElemento = 0;
         }
 
     } else if(lista->listaNode[i].proximo == -1) {
@@ -234,4 +238,31 @@ bool excluirElementoPosicaoX(Lista l, int i, void(*apagarElemento)(Elemento elem
     lista->listaNode[i].proximo = lista->proximoLivre;
     lista->proximoLivre = i;
     return true;
+}
+
+
+bool excluirElementoMemoriaLista(Lista l, Elemento elemento) {
+    StInfoLista lista = (StInfoLista) l;
+    for(int i = lista->primeiroElemento; i != -1; i = lista->listaNode[i].proximo) {
+        if(lista->listaNode[i].elemento == elemento) {
+            if(i == lista->primeiroElemento) {
+                lista->primeiroElemento = lista->listaNode[i].proximo;
+                if (lista->listaNode[i].proximo == -1) {
+                    lista->listaNode[i].proximo = -1;
+                    lista->ultimoElemento = 0;
+                }
+            } else if(lista->listaNode[i].proximo == -1) {
+                lista->listaNode[lista->listaNode[i].anterior].proximo = -1;
+                lista->ultimoElemento = lista->listaNode[i].anterior;
+            } else {
+                lista->listaNode[lista->listaNode[i].anterior].proximo = lista->listaNode[i].proximo;
+                lista->listaNode[lista->listaNode[i].proximo].anterior = lista->listaNode[i].anterior;
+            }
+            lista->tamanhoAtual--;
+            lista->listaNode[i].proximo = lista->proximoLivre;
+            lista->proximoLivre = i;
+            return true;
+        }
+    }
+    return false;
 }

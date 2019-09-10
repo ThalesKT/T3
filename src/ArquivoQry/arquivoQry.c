@@ -3,7 +3,7 @@
 void arquivoQry(char *pesquisageo, char *pesquisaconsulta,
 char *saidaconsultatxt, char *saidaconsultasvg, char *boundingbox,
 Lista listaFormas, Lista listaQuadras, Lista listaHidrantes, Lista listaSemaforo,
-Lista listaRadioBase, FILE *consultaSVG) {
+Lista listaRadioBase, Lista listaPredios, Lista listaMuros, FILE *consultaSVG) {
     FILE *arquivoTXT;
     FILE *consulta;
     arquivoTXT = fopen(saidaconsultatxt, "w");
@@ -236,6 +236,11 @@ Lista listaRadioBase, FILE *consultaSVG) {
             processarObjetosProximos(listaHidrantes, listaQuadras, sinal,
              k, cep, face, num, arquivoTXT, consultaSVG, "semaforo");
 
+        } else if(strcmp(instrucao, "brl") == 0) {
+
+            double x, y;
+            sscanf(linha, "%*s %lf %lf", &x, &y);
+            processarBombaRL(listaPredios, listaMuros, x, y, consultaSVG);
         }
     }
 

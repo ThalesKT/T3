@@ -10,7 +10,7 @@ typedef void *Lista;
 typedef void *Elemento;
 
 Lista inicializarLista(int tamanhoMax);
-void destruirLista(Lista l, void(*destruirElemento)(Elemento elemento));
+void desalocarLista(Lista l, void(*destruirElemento)(Elemento elemento));
 int getPosicaoLivreLista(Lista l);
 int getPrimeiroElementoLista(Lista l);
 int getProximoElemento(Lista l, int posicao);
@@ -29,5 +29,6 @@ Elemento getElementoeTipo(Lista l, char *tipo1, char *id);
 Elemento getElementoListaPosicao(Lista l, int i);
 void getTipoElemento(Lista l, int i, char *tipo);
 bool excluirElementoPosicaoX(Lista l, int i, void(*apagarObjeto)(Elemento elemento));
+bool excluirElementoMemoriaLista(Lista l, Elemento elemento);
 #endif // !_listaEstatica_h_
 
